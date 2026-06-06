@@ -142,3 +142,6 @@ def delete_room(id):
     db.commit()
 
     return redirect('/room')
+
+if __name__ == '__main__':
+    app.run(debug=True)
