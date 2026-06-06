@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card">
+
+<h2>Edit Room 🏠</h2>
+
+<form method="POST">
+
+<input
+type="text"
+name="room_number"
+value="{{ room.room_number }}"
+placeholder="Room Number">
+
+<input
+type="text"
+name="type"
+value="{{ room.type }}"
+placeholder="Room Type">
+
+<input
+type="number"
+name="price"
+value="{{ room.price }}"
+placeholder="Price">
+
+<input
+type="text"
+name="status"
+value="{{ room.status }}"
+placeholder="Status">
+
+<button type="submit">
+    Update
+</button>
+
+</form>
+
+</div>
+
+{% endblock %}

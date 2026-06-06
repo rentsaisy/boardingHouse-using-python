@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card">
+
+<h2>Room Data 🏠</h2>
+
+<a href="/add_room" class="btn">
+    Add Room
+</a>
+
+<table>
+
+<tr>
+    <th>ID</th>
+    <th>Room Number</th>
+    <th>Type</th>
+    <th>Price</th>
+    <th>Status</th>
+    <th>Action</th>
+</tr>
+
+{% for r in rooms %}
+
+<tr>
+    <td>{{ r.room_id }}</td>
+    <td>{{ r.room_number }}</td>
+    <td>{{ r.type }}</td>
+    <td>{{ r.price }}</td>
+    <td>{{ r.status }}</td>
+
+    <td>
+        <a href="/edit_room/{{ r.room_id }}">Edit</a>
+        |
+        <a href="/delete_room/{{ r.room_id }}">
+            Delete
+        </a>
+    </td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+{% endblock %}

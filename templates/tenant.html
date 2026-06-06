@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card">
+
+<h2>Tenant Data 🌸</h2>
+
+<a href="/add_tenant" class="btn">
+    Add Tenant
+</a>
+
+<table>
+
+<tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Phone</th>
+    <th>Address</th>
+    <th>Emergency Contact</th>
+    <th>Action</th>
+</tr>
+
+{% for t in tenants %}
+
+<tr>
+    <td>{{ t.tenant_id }}</td>
+    <td>{{ t.name }}</td>
+    <td>{{ t.phone }}</td>
+    <td>{{ t.address }}</td>
+    <td>{{ t.emergency_contact }}</td>
+
+    <td>
+        <a href="/edit_tenant/{{ t.tenant_id }}">Edit</a>
+        |
+        <a href="/delete_tenant/{{ t.tenant_id }}">
+            Delete
+        </a>
+    </td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+{% endblock %}
