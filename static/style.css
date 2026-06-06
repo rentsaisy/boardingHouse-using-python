@@ -70,6 +70,15 @@ body{
     padding:20px;
     border-radius:15px;
     box-shadow:0 0 10px rgba(0,0,0,0.1);
+    text-align:center;
+}
+
+.welcome-gif{
+    width:300px;
+    height:300px;
+    object-fit:contain;
+    margin:20px auto;
+    display:block;
 }
 
 table{
