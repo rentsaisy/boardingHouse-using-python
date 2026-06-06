@@ -4,11 +4,15 @@
 
 <div class="card">
 
-<h2>Room Data 🏠</h2>
+<h2>Room Data </h2>
 
-<a href="/add_room" class="btn">
-    Add Room
-</a>
+<div class="header-controls">
+    <button onclick="openAddRoomModal()" class="btn">
+        Add Room
+    </button>
+    
+    <input type="text" id="searchInput" placeholder="Search by room number, type, or status..." class="search-bar" onkeyup="searchTable()">
+</div>
 
 <table>
 
@@ -21,28 +25,208 @@
     <th>Action</th>
 </tr>
 
+<tbody id="tableBody">
 {% for r in rooms %}
 
-<tr>
+<tr class="data-row">
     <td>{{ r.room_id }}</td>
     <td>{{ r.room_number }}</td>
     <td>{{ r.type }}</td>
-    <td>{{ r.price }}</td>
+    <td>{{ "{:,.0f}".format(r.price).replace(",", ".") }}</td>
     <td>{{ r.status }}</td>
 
     <td>
-        <a href="/edit_room/{{ r.room_id }}">Edit</a>
-        |
-        <a href="/delete_room/{{ r.room_id }}">
-            Delete
-        </a>
+        <button onclick="openEditRoomModal({{ r.room_id }}, '{{ r.room_number }}', '{{ r.type }}', '{{ r.price }}', '{{ r.status }}')" class="btn-edit">Edit</button>
+        <button onclick="deleteRoomConfirm({{ r.room_id }})" class="btn-delete">Delete</button>
     </td>
 </tr>
 
 {% endfor %}
+</tbody>
 
 </table>
 
+<!-- Pagination -->
+<div class="pagination-container">
+    <button class="pagination-btn" onclick="previousPage()" id="prevBtn">← Previous</button>
+    <span id="pageInfo" class="page-info">Page 1</span>
+    <button class="pagination-btn" onclick="nextPage()" id="nextBtn">Next →</button>
 </div>
+
+</div>
+
+<!-- Add Room Modal -->
+<div id="addRoomModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeAddRoomModal()">&times;</span>
+        <h2>Add Room</h2>
+        <form method="POST" action="/add_room">
+            <input type="text" name="room_number" placeholder="Room Number" required>
+            <select name="type" required>
+                <option value="" disabled selected>Select Type</option>
+                <option value="Single">Single</option>
+                <option value="Double">Double</option>
+                <option value="Twin">Twin</option>
+                <option value="Suite">Suite</option>
+            </select>
+            <input type="text" name="price" placeholder="Price" required>
+            <select name="status" required>
+                <option value="" disabled selected>Select Status</option>
+                <option value="Available">Available</option>
+                <option value="Occupied">Occupied</option>
+            </select>
+            <button type="submit" class="btn">Save</button>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Room Modal -->
+<div id="editRoomModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditRoomModal()">&times;</span>
+        <h2>Edit Room</h2>
+        <form method="POST" id="editRoomForm">
+            <input type="text" id="editRoomNumber" name="room_number" placeholder="Room Number" required>
+            <select id="editRoomType" name="type" required>
+                <option value="" disabled selected>Select Type</option>
+                <option value="Single">Single</option>
+                <option value="Double">Double</option>
+                <option value="Twin">Twin</option>
+                <option value="Suite">Suite</option>
+            </select>
+            <input type="text" id="editRoomPrice" name="price" placeholder="Price" required>
+            <select id="editRoomStatus" name="status" required>
+                <option value="" disabled selected>Select Status</option>
+                <option value="Available">Available</option>
+                <option value="Occupied">Occupied</option>
+            </select>
+            <button type="submit" class="btn">Update</button>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteConfirmModal" class="modal">
+    <div class="modal-content delete-modal">
+        <h2>⚠️ Confirm Delete</h2>
+        <p>Are you sure you want to delete this room? This action cannot be undone.</p>
+        <div class="modal-buttons">
+            <button class="btn-cancel" onclick="closeDeleteConfirm()">Cancel</button>
+            <button class="btn-confirm-delete" id="confirmDeleteBtn">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let deleteItemId = null;
+let currentPage = 1;
+const itemsPerPage = 5;
+let filteredRows = [];
+let allRows = [];
+
+function initializePagination() {
+    allRows = Array.from(document.querySelectorAll('.data-row'));
+    filteredRows = allRows;
+    displayPage(1);
+}
+
+function displayPage(page) {
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    
+    allRows.forEach(row => row.style.display = 'none');
+    
+    for (let i = startIndex; i < endIndex && i < filteredRows.length; i++) {
+        filteredRows[i].style.display = '';
+    }
+    
+    currentPage = page;
+    updatePaginationButtons();
+    document.getElementById('pageInfo').textContent = `Page ${page} of ${Math.ceil(filteredRows.length / itemsPerPage)}`;
+}
+
+function updatePaginationButtons() {
+    const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+    document.getElementById('prevBtn').disabled = currentPage === 1;
+    document.getElementById('nextBtn').disabled = currentPage === totalPages;
+}
+
+function nextPage() {
+    const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+    if (currentPage < totalPages) {
+        displayPage(currentPage + 1);
+    }
+}
+
+function previousPage() {
+    if (currentPage > 1) {
+        displayPage(currentPage - 1);
+    }
+}
+
+function searchTable() {
+    const input = document.getElementById('searchInput');
+    const filter = input.value.toLowerCase();
+    
+    filteredRows = allRows.filter(row => {
+        const text = row.textContent.toLowerCase();
+        return text.includes(filter);
+    });
+    
+    displayPage(1);
+}
+
+function openAddRoomModal() {
+    document.getElementById('addRoomModal').style.display = 'block';
+}
+
+function closeAddRoomModal() {
+    document.getElementById('addRoomModal').style.display = 'none';
+}
+
+function openEditRoomModal(id, room_number, type, price, status) {
+    document.getElementById('editRoomNumber').value = room_number;
+    document.getElementById('editRoomType').value = type;
+    document.getElementById('editRoomPrice').value = price;
+    document.getElementById('editRoomStatus').value = status;
+    document.getElementById('editRoomForm').action = '/edit_room/' + id;
+    document.getElementById('editRoomModal').style.display = 'block';
+}
+
+function closeEditRoomModal() {
+    document.getElementById('editRoomModal').style.display = 'none';
+}
+
+function deleteRoomConfirm(id) {
+    deleteItemId = id;
+    document.getElementById('deleteConfirmModal').style.display = 'block';
+    document.getElementById('confirmDeleteBtn').onclick = function() {
+        window.location.href = '/delete_room/' + deleteItemId;
+    };
+}
+
+function closeDeleteConfirm() {
+    document.getElementById('deleteConfirmModal').style.display = 'none';
+    deleteItemId = null;
+}
+
+window.onclick = function(event) {
+    var addRoomModal = document.getElementById('addRoomModal');
+    var editRoomModal = document.getElementById('editRoomModal');
+    var deleteModal = document.getElementById('deleteConfirmModal');
+    if (event.target == addRoomModal) {
+        addRoomModal.style.display = 'none';
+    }
+    if (event.target == editRoomModal) {
+        editRoomModal.style.display = 'none';
+    }
+    if (event.target == deleteModal) {
+        deleteModal.style.display = 'none';
+    }
+}
+
+// Initialize pagination on page load
+document.addEventListener('DOMContentLoaded', initializePagination);
+</script>
 
 {% endblock %}
