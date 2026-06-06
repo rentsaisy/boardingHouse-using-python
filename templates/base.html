@@ -11,14 +11,22 @@
 <body>
 
 <div class="navbar">
-    <h1>🌸 Girls Boarding House 🌸</h1>
+
+    <div class="nav-left">
+        <img src="{{ url_for('static', filename='lily.png') }}"
+        class="nav-img">
+
+        <h1>Girls' Boarding House </h1>
+    </div>
 
     <div class="menu">
         <a href="/">Home</a>
         <a href="/tenant">Tenant</a>
         <a href="/room">Room</a>
     </div>
+
 </div>
+
 
 <div class="container">
     {% block content %}
